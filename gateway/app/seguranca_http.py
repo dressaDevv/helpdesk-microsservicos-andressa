@@ -1,16 +1,13 @@
-"""Proteções aplicadas a todas as respostas HTTP."""
-from fastapi import Request
+﻿from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import TAMANHO_MAXIMO_REQUISICAO
 
-# A tela só carrega arquivos do próprio servidor (bloqueia scripts injetados)
 CSP_TELA = (
     "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
     "connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
 )
-# A documentação (Swagger) carrega arquivos de um CDN
 CSP_DOCS = (
     "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; "

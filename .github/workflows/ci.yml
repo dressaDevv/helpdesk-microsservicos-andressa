@@ -1,0 +1,26 @@
+﻿name: Testes dos Microsservicos
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  testar-servicos:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        servico: [servico-usuarios, servico-inventario, servico-chamados, servico-notificacoes, gateway]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar dependencias
+        working-directory: ${{ matrix.servico }}
+        run: pip install -r requirements.txt pytest
+      - name: Rodar testes
+        working-directory: ${{ matrix.servico }}
+        env:
+          JWT_SEGREDO: segredo-de-testes-ci-helpdesk-microsservicos-2026
+        run: pytest -v

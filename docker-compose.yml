@@ -1,15 +1,21 @@
-services:
-  helpdesk:
-    build: .
+﻿services:
+  gateway:
+    build: ./gateway
     ports:
-      - "127.0.0.1:8000:8000"   # só acessível pelo próprio computador
+      - "127.0.0.1:8000:8000"
     env_file:
       - path: .env
         required: false
     environment:
-      DADOS_EXEMPLO: ${DADOS_EXEMPLO:-1}
-    volumes:
-      - dados:/dados
+      USUARIOS_URL: http://usuarios:8000
+      INVENTARIO_URL: http://inventario:8000
+      CHAMADOS_URL: http://chamados:8000
+      NOTIFICACOES_URL: http://notificacoes:8000
+    depends_on:
+      - usuarios
+      - inventario
+      - chamados
+      - notificacoes
     read_only: true
     tmpfs:
       - /tmp
@@ -18,5 +24,97 @@ services:
     cap_drop:
       - ALL
 
+  usuarios:
+    build: ./servico-usuarios
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: sqlite:////dados/usuarios.db
+      DADOS_EXEMPLO: ${DADOS_EXEMPLO:-1}
+    volumes:
+      - dados_usuarios:/dados
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  inventario:
+    build: ./servico-inventario
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: sqlite:////dados/inventario.db
+      DADOS_EXEMPLO: ${DADOS_EXEMPLO:-1}
+    volumes:
+      - dados_inventario:/dados
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  chamados:
+    build: ./servico-chamados
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: sqlite:////dados/chamados.db
+      USUARIOS_URL: http://usuarios:8000
+      INVENTARIO_URL: http://inventario:8000
+      REDIS_URL: redis://redis:6379/0
+      DADOS_EXEMPLO: ${DADOS_EXEMPLO:-1}
+    volumes:
+      - dados_chamados:/dados
+    depends_on:
+      - usuarios
+      - inventario
+      - redis
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  notificacoes:
+    build: ./servico-notificacoes
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: sqlite:////dados/notificacoes.db
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - dados_notificacoes:/dados
+    depends_on:
+      - redis
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  redis:
+    image: redis:7-alpine
+    user: redis
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
 volumes:
-  dados:
+  dados_usuarios:
+  dados_inventario:
+  dados_chamados:
+  dados_notificacoes:
