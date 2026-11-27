@@ -1,4 +1,4 @@
-﻿name: Testes dos Microsservicos
+name: Testes dos Microsservicos
 on: [push, pull_request]
 jobs:
   testar-servicos:
@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: "3.12"
       - working-directory: ${{ matrix.servico }}
-        run: pip install -r requirements.txt pytest
+        run: pip install -r requirements.txt pytest httpx2
       - working-directory: ${{ matrix.servico }}
         env:
           JWT_SEGREDO: segredo-de-testes-ci-helpdesk-microsservicos-2026
