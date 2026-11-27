@@ -1,4 +1,4 @@
-﻿from datetime import datetime
+from datetime import datetime
 
 from app import clientes
 from app.erros import ServicoIndisponivel
@@ -11,7 +11,7 @@ def test_saude(cliente):
 
 def test_exige_login(cliente):
     assert cliente.get("/chamados").status_code == 401
-    assert cliente.post("/chamados", json={"titulo": "PC com defeito", "descricao": "Erro", "prioridade": "baixa"}).status_code == 401
+    assert cliente.post("/chamados", json={"titulo": "PC com defeito", "descricao": "Equipamento apresentando falha tecnica", "prioridade": "baixa"}).status_code == 401
 
 
 def test_abrir_calcula_sla_e_publica_evento(cliente, contas, mocks_rede):
@@ -32,7 +32,7 @@ def test_abrir_com_ativo_inexistente(cliente, contas, mocks_rede):
     r = cliente.post(
         "/chamados",
         headers=contas["ana"]["headers"],
-        json={"titulo": "PC com defeito", "descricao": "Erro", "prioridade": "alta", "ativo_id": 999},
+        json={"titulo": "PC com defeito", "descricao": "Equipamento apresentando falha tecnica", "prioridade": "alta", "ativo_id": 999},
     )
     assert r.status_code == 404
 
@@ -45,7 +45,7 @@ def test_inventario_fora_do_ar_retorna_503(cliente, contas, monkeypatch):
     r = cliente.post(
         "/chamados",
         headers=contas["ana"]["headers"],
-        json={"titulo": "PC com defeito", "descricao": "Erro", "prioridade": "alta", "ativo_id": 1},
+        json={"titulo": "PC com defeito", "descricao": "Equipamento apresentando falha tecnica", "prioridade": "alta", "ativo_id": 1},
     )
     assert r.status_code == 503
 
